@@ -1,5 +1,7 @@
 package main.controllers;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -11,15 +13,19 @@ import main.apivk.APIvk;
 import org.apache.http.HttpException;
 import org.json.JSONException;
 
+import org.apache.http.HttpException;
+
+import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by shi on 16.09.16.
  */
-public class UserOverviewController {
+public class UserOverviewController{
 
     @FXML
     FlowPane flowPane;
@@ -53,7 +59,8 @@ public class UserOverviewController {
 
             for (String s : firstSet) {
                 ImageView avatar = new ImageView(apiVk.getUserInfo(s).getPhotoURL());
-                Label user = new Label(apiVk.getUserInfo(s).getFirstName()+"\n"+apiVk.getUserInfo(s).getLastName(), avatar);
+                Label user = new Label(apiVk.getUserInfo(s).getFirstName()+"\n"
+                                        +apiVk.getUserInfo(s).getLastName(), avatar);
                 user.setContentDisplay(ContentDisplay.TOP);
                 flowPane.getChildren().add(user);
             }

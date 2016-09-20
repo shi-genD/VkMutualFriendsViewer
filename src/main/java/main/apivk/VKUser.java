@@ -11,6 +11,8 @@ public class VKUser {
 
     private String firstName;
     private String lastName;
+
+    private String userId;
     private String photoURL;
 
 
@@ -26,6 +28,10 @@ public class VKUser {
         return photoURL;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -38,13 +44,18 @@ public class VKUser {
         this.photoURL = photoURL;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public void parseAndSetUser(String source) throws JSONException {
         JSONObject js = new JSONObject(source);
         JSONArray response = js.getJSONArray("response");
         JSONObject jo = response.getJSONObject(0);
         setFirstName(jo.getString("first_name"));
         setLastName(jo.getString("last_name"));
-        setPhotoURL(jo.getString("photo_50").replaceAll("\\\\", ""));
+        setUserId(jo.getString("uid"));
+        setPhotoURL(jo.getString("photo_100").replaceAll("\\\\", ""));
     }
 
     @Override
@@ -52,6 +63,7 @@ public class VKUser {
         return "VKUser{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", userId='" + userId + '\'' +
                 ", photoURL='" + photoURL + '\'' +
                 '}';
     }

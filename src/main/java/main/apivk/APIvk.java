@@ -31,8 +31,8 @@ public class APIvk {
     private String display = "page";
     private String response_type = "token";
     private String access_token;
-    private String email = "79686147598";//тут должен быть прописан email
-    private String pass = "himitsudes42vk";//тут должен быть прописан пароль
+    private String email = "************";//тут должен быть прописан email
+    private String pass = "**********";//тут должен быть прописан пароль
 
     public void setConnection() throws IOException, URISyntaxException, HttpException {
         HttpClient httpClient = new DefaultHttpClient();
@@ -86,14 +86,13 @@ public class APIvk {
     }
 
     public Set<String> getFriends(String id) throws URISyntaxException, HttpException, IOException, JSONException {
-        String URL = new String("https://api.vk.com/method/friends.get?user_id="+id);
-        //String URL = new String("https://api.vk.com/method/friends.get?user_id="+id+"&count=3&fields=first_name");
+        String URL = "https://api.vk.com/method/friends.get?user_id="+id;
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(new HttpGet(URL));
         HttpEntity entity = response.getEntity();
         String responseString = EntityUtils.toString(entity, "UTF-8");
         JSONObject json = new JSONObject(responseString);
-        String str = new String(json.getString("response"));
+        String str = json.getString("response");
         String [] sarr = str.substring(1, str.length()-1).split(",");
         for (String s : sarr) {
             System.out.print(s+" ");
@@ -105,7 +104,7 @@ public class APIvk {
     }
 
     public VKUser getUserInfo(String id) throws URISyntaxException, HttpException, IOException, JSONException {
-        String URL = new String("https://api.vk.com/method/users.get?user_id="+id+"&fields=photo_50");
+        String URL = "https://api.vk.com/method/users.get?user_id="+id+"&fields=photo_100";
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(new HttpGet(URL));
         HttpEntity entity = response.getEntity();

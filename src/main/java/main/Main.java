@@ -1,6 +1,7 @@
 package main;
 
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import main.controllers.*;
@@ -65,7 +66,7 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/controllers/UserOverview.fxml"));
             FlowPane userOverview = (FlowPane) loader.load();
-
+            userOverview.setAlignment(Pos.TOP_CENTER);
             Stage stage = new Stage();
             stage.setTitle("Results");
             stage.initModality(Modality.WINDOW_MODAL);

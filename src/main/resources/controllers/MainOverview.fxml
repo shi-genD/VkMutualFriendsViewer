@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controllers.MainOverviewController">
+   <children>
+      <Label layoutX="52.0" layoutY="49.0" text="Insert IDs in the field below and press &quot;Go&quot;" />
+      <Label layoutX="52.0" layoutY="95.0" text="id" />
+      <Label layoutX="52.0" layoutY="152.0" text="id" />
+      <TextField fx:id="firstId" layoutX="76.0" layoutY="90.0" />
+      <TextField fx:id="secondId" layoutX="76.0" layoutY="147.0" />
+      <Button fx:id="btnGo" layoutX="269.0" layoutY="115.0" mnemonicParsing="false" onAction="#handleGo" text="Go" />
+   </children>
+</AnchorPane>

@@ -3,7 +3,12 @@ package main;
 
 import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
 import com.sun.javafx.application.HostServicesDelegate;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import main.controllers.*;
@@ -62,11 +67,12 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/controllers/UserOverview.fxml"));
             FlowPane userOverview = loader.load();
-            userOverview.setAlignment(Pos.TOP_CENTER);
+
             Stage stage = new Stage();
             stage.setTitle("Results");
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(primaryStage);
+
             Scene scene = new Scene(userOverview);
             stage.setScene(scene);
             HostServicesDelegate hostService = HostServicesFactory.getInstance(this);

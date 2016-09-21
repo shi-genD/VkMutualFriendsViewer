@@ -41,7 +41,6 @@ public class UserOverviewController{
         try {
                 mutualFriends = apiVk.getMutualFriends(id1, id2);
                 for (String user : mutualFriends) {
-                    ImageView slow = new ImageView("http://cs301804.vk.me/v301804880/5a80/vYtHFEoDKxM.jpg");
                     ImageView avatar = new ImageView(apiVk.getUser(user).getPhotoURL());
                     String userUrl = "http://vk.com/id" + apiVk.getUser(user).getUserId();
                     Button userView = new Button(apiVk.getUser(user).getFirstName()+"\n"

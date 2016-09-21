@@ -1,6 +1,8 @@
 package main;
 
 
+import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
+import com.sun.javafx.application.HostServicesDelegate;
 import javafx.geometry.Pos;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
@@ -23,19 +25,15 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("VK Viewer");
-        //this.primaryStage.getIcons().add(new Image("file:resources/images/accessories-text-editor-128.png"));
-
         initRootLayout();
-
         showMainOverview();
-
     }
 
     public void initRootLayout() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/controllers/RootLayout.fxml"));
-            rootLayout = (BorderPane) loader.load();
+            rootLayout = loader.load();
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
@@ -49,10 +47,8 @@ public class Main extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/controllers/MainOverview.fxml"));
-            AnchorPane mainOverview = (AnchorPane) loader.load();
-
+            AnchorPane mainOverview = loader.load();
             rootLayout.setCenter((mainOverview));
-
             MainOverviewController controller = loader.getController();
             controller.setMain(this);
 
@@ -65,7 +61,7 @@ public class Main extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/controllers/UserOverview.fxml"));
-            FlowPane userOverview = (FlowPane) loader.load();
+            FlowPane userOverview = loader.load();
             userOverview.setAlignment(Pos.TOP_CENTER);
             Stage stage = new Stage();
             stage.setTitle("Results");
@@ -73,9 +69,9 @@ public class Main extends Application {
             stage.initOwner(primaryStage);
             Scene scene = new Scene(userOverview);
             stage.setScene(scene);
-
+            HostServicesDelegate hostService = HostServicesFactory.getInstance(this);
             UserOverviewController controller = loader.getController();
-            controller.setDialogStage(stage, id1, id2);
+            controller.setDialogStage(stage, id1, id2, hostService);
 
             stage.showAndWait();
 

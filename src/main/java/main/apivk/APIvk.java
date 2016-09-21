@@ -1,23 +1,18 @@
 package main.apivk;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.IOException;
 import org.apache.http.HttpException;
 import org.apache.http.util.EntityUtils;
-
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -25,7 +20,46 @@ import java.util.Set;
  */
 public class APIvk {
 
-    private String client_id = "5629635";
+
+    public List<String> getFriends(String id) throws URISyntaxException, HttpException, IOException, JSONException {
+        String URL = "https://api.vk.com/method/friends.get?user_id="+id;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = httpClient.execute(new HttpGet(URL));
+        HttpEntity entity = response.getEntity();
+        String responseString = EntityUtils.toString(entity, "UTF-8");
+
+        JSONObject json = new JSONObject(responseString);
+        JSONArray jarr = json.getJSONArray("response");
+        List<String> friendList = new ArrayList<>();
+        for (int i = 0; i < jarr.length(); i++){
+            friendList.add(jarr.get(i).toString());
+            System.out.print(jarr.get(i).toString() + " ");
+        }
+        System.out.println();
+        return friendList;
+    }
+
+    public Set<String> getMutualFriends(String id1, String id2) throws URISyntaxException, HttpException, IOException, JSONException{
+        Set<String> mutualFriends = new HashSet<>();
+        mutualFriends.addAll(getFriends(id1));
+        mutualFriends.retainAll(getFriends(id2));
+        System.out.println("Number: "+mutualFriends.size());
+        System.out.println(mutualFriends.toString());
+        return mutualFriends;
+    }
+
+    public VKUser getUser(String id) throws URISyntaxException, HttpException, IOException, JSONException {
+        String URL = "https://api.vk.com/method/users.get?user_id="+id+"&fields=photo_100";
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = httpClient.execute(new HttpGet(URL));
+        HttpEntity entity = response.getEntity();
+        String responseString = EntityUtils.toString(entity, "UTF-8");
+        VKUser user = new VKUser();
+        user.parseAndSetUser(responseString);
+        return user;
+    }
+
+  /*  private String client_id = "5629635";
     private String scope = "friends";
     private String redirect_uri = "http://oauth.vk.com/blank.html";
     private String display = "page";
@@ -83,34 +117,6 @@ public class APIvk {
         access_token = HeaderLocation.split("#")[1].split("&")[0].split("=")[1];
 
         System.out.println(access_token);
-    }
+    }*/
 
-    public Set<String> getFriends(String id) throws URISyntaxException, HttpException, IOException, JSONException {
-        String URL = "https://api.vk.com/method/friends.get?user_id="+id;
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpResponse response = httpClient.execute(new HttpGet(URL));
-        HttpEntity entity = response.getEntity();
-        String responseString = EntityUtils.toString(entity, "UTF-8");
-        JSONObject json = new JSONObject(responseString);
-        String str = json.getString("response");
-        String [] sarr = str.substring(1, str.length()-1).split(",");
-        for (String s : sarr) {
-            System.out.print(s+" ");
-        }
-        System.out.println();
-        Set<String> set = new HashSet<>(Arrays.asList(sarr));
-
-        return set;
-    }
-
-    public VKUser getUserInfo(String id) throws URISyntaxException, HttpException, IOException, JSONException {
-        String URL = "https://api.vk.com/method/users.get?user_id="+id+"&fields=photo_100";
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpResponse response = httpClient.execute(new HttpGet(URL));
-        HttpEntity entity = response.getEntity();
-        String responseString = EntityUtils.toString(entity, "UTF-8");
-        VKUser user = new VKUser();
-        user.parseAndSetUser(responseString);
-        return user;
-    }
 }

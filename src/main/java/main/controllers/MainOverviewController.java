@@ -5,9 +5,7 @@ package main.controllers;
  */
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.FlowPane;
 import main.Main;
 
 public class MainOverviewController {
@@ -24,20 +22,16 @@ public class MainOverviewController {
     private Main mainApp;
 
     @FXML
-    private void initialize() {
-
-    }
+    private void initialize() { }
 
     @FXML
     private void handleGo() {
-        String s1 = firstId.getText();
-        String s2 = secondId.getText();
-        if (s1.length()!=0 && s2.length()!=0) {
-            mainApp.showUserOverview(s1, s2);
+        String id1 = firstId.getText();
+        String id2 = secondId.getText();
+        if (id1.length()!=0 && id2.length()!=0) {
+            mainApp.showUserOverview(id1, id2);
         }
-
     }
-
 
     public void setMain(Main mainApp) { this.mainApp = mainApp; }
 

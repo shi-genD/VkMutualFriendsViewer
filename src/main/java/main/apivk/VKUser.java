@@ -11,10 +11,8 @@ public class VKUser {
 
     private String firstName;
     private String lastName;
-
     private String userId;
     private String photoURL;
-
 
     public String getFirstName() {
         return firstName;
@@ -32,23 +30,23 @@ public class VKUser {
         return userId;
     }
 
-    public void setFirstName(String firstName) {
+    private void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    public void setLastName(String lastName) {
+    private void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public void setPhotoURL(String photoURL) {
+    private void setPhotoURL(String photoURL) {
         this.photoURL = photoURL;
     }
 
-    public void setUserId(String userId) {
+    private void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public void parseAndSetUser(String source) throws JSONException {
+    void parseAndSetUser(String source) throws JSONException {
         JSONObject js = new JSONObject(source);
         JSONArray response = js.getJSONArray("response");
         JSONObject jo = response.getJSONObject(0);

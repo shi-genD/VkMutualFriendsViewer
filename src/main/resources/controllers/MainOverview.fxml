@@ -9,11 +9,13 @@
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
             <Label layoutX="59.0" layoutY="27.0" text="Insert ids in fields below and press &quot;Go&quot;" />
-            <Label layoutX="103.0" layoutY="76.0" text="id" />
-            <Label layoutX="103.0" layoutY="124.0" text="id" />
-            <TextField fx:id="firstId" layoutX="125.0" layoutY="70.0" />
-            <TextField fx:id="secondId" layoutX="125.0" layoutY="118.0" />
+            <Label layoutX="103.0" layoutY="64.0" text="id" />
+            <Label layoutX="103.0" layoutY="132.0" text="id" />
+            <TextField fx:id="firstId" layoutX="125.0" layoutY="58.0" />
+            <TextField fx:id="secondId" layoutX="125.0" layoutY="126.0" />
             <Button fx:id="btnGo" layoutX="337.0" layoutY="95.0" mnemonicParsing="false" onAction="#handleGo" text="Go" />
+            <Label fx:id="firstErrMsg" layoutX="311.0" layoutY="64.0" textFill="RED" />
+            <Label fx:id="secondErrMsg" layoutX="311.0" layoutY="131.0" textFill="RED" />
          </children>
       </AnchorPane>
       <ScrollPane>

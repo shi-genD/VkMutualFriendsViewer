@@ -25,7 +25,7 @@ public class APIvk {
 
     public String parseInputId(String str, int n) throws UserNotFoundException, IOException{
         if (str == null || str.length() == 0)
-            throw new UserNotFoundException(n + ":Invalid user id");
+            throw new UserNotFoundException("Invalid user id", n);
         StringParser sp = new StringParser(str);
         if (sp.checkUrl())
             if (sp.checkString())
@@ -33,7 +33,7 @@ public class APIvk {
             else
                 return getId(sp.getString(), n);
         else
-            throw new UserNotFoundException(n + ":Invalid user id");
+            throw new UserNotFoundException("Invalid user id", n);
     }
 
     private String getId(String shortLink, int n) throws IOException, UserNotFoundException{
@@ -48,11 +48,11 @@ public class APIvk {
             JSONArray jarr = json.getJSONArray("response");
             JSONObject jo = new JSONObject(jarr.get(0).toString());
             if (jo.has("deactivated")) {
-                throw new UserNotFoundException(n + ":User " + jo.getString("deactivated"));
+                throw new UserNotFoundException("User " + jo.getString("deactivated"), n);
             }
             return jo.getString("uid");
         }  catch (JSONException e) {
-            throw new UserNotFoundException(n + ":Invalid user id");
+            throw new UserNotFoundException("Invalid user id", n);
         }
 
     }

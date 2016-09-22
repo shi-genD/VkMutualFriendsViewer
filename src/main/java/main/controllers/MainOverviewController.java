@@ -47,7 +47,6 @@ public class MainOverviewController {
     @FXML
     private FlowPane flowPane;
 
-    private Set<VkUser> mutualFriends;
     private Main mainApp;
 
     @FXML
@@ -61,21 +60,19 @@ public class MainOverviewController {
     @FXML
     private void handleGo() throws InterruptedException {
         flowPane.getChildren().clear();
-        firstErrMsg.setText("");
-        secondErrMsg.setText("");
+        List<Label> labels = new ArrayList<>();
+        labels.add(firstErrMsg); labels.add(secondErrMsg);
+        for (Label l : labels)
+            l.setText("");
 
         APIvk apiVk = new APIvk();
         try {
-            String id1 = apiVk.parseInputId(firstId.getText(), 1);
-            String id2 = apiVk.parseInputId(secondId.getText(), 2);
-            mutualFriends = apiVk.getMutualFriends(id1, id2);
+            String id1 = apiVk.parseInputId(firstId.getText(), 0);
+            String id2 = apiVk.parseInputId(secondId.getText(), 1);
+            Set<VkUser> mutualFriends = apiVk.getMutualFriends(id1, id2);
             showResult(mutualFriends);
         } catch (UserNotFoundException e) {
-            //e.printStackTrace();
-            if (e.getMessage().startsWith("1"))
-                firstErrMsg.setText(e.getMessage().substring(2));
-            else if (e.getMessage().startsWith("2"))
-                secondErrMsg.setText(e.getMessage().substring(2));
+            labels.get(e.getNumber()).setText(e.getMessage());
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
@@ -87,6 +84,7 @@ public class MainOverviewController {
                 flowPane.getChildren().add(new Label("Mutual friends not found"));
                 return;
             }
+        
             Map<VkUser, Future<Image>> friendsPhotos = getUserPhotos(mutualFriends);
             ImageViewAsyncApplier imageViewApplier = new ImageViewAsyncApplier();
 

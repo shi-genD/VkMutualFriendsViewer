@@ -84,7 +84,7 @@ public class MainOverviewController {
                 flowPane.getChildren().add(new Label("Mutual friends not found"));
                 return;
             }
-        
+
             Map<VkUser, Future<Image>> friendsPhotos = getUserPhotos(mutualFriends);
             ImageViewAsyncApplier imageViewApplier = new ImageViewAsyncApplier();
 

@@ -1,8 +1,7 @@
 package main.apivk;
 
-import main.utils.StringParser;
-import main.utils.UserNotFoundException;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -13,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,41 +23,7 @@ import java.util.Set;
  */
 public class APIvk {
 
-    public String parseInputId(String str, int n) throws UserNotFoundException, IOException{
-        if (str == null || str.length() == 0)
-            throw new UserNotFoundException(n + ":Invalid user id");
-        StringParser sp = new StringParser(str);
-        if (sp.checkUrl())
-            if (sp.checkString())
-                return getId(str, n);
-            else
-                return getId(sp.getString(), n);
-        else
-            throw new UserNotFoundException(n + ":Invalid user id");
-    }
-
-    private String getId(String shortLink, int n) throws IOException, UserNotFoundException{
-        try {
-            String URL = "https://api.vk.com/method/users.get?user_ids=" + shortLink;
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpResponse response = httpClient.execute(new HttpGet(URL));
-            HttpEntity entity = response.getEntity();
-            String responseString = EntityUtils.toString(entity, "UTF-8");
-
-            JSONObject json = new JSONObject(responseString);
-            JSONArray jarr = json.getJSONArray("response");
-            JSONObject jo = new JSONObject(jarr.get(0).toString());
-            if (jo.has("deactivated")) {
-                throw new UserNotFoundException(n + ":User " + jo.getString("deactivated"));
-            }
-            return jo.getString("uid");
-        }  catch (JSONException e) {
-            throw new UserNotFoundException(n + ":Invalid user id");
-        }
-
-    }
-
-    private List<VkUser> getFriends(String id) throws IOException, JSONException {
+    public List<VkUser> getFriends(String id) throws URISyntaxException, HttpException, IOException, JSONException {
         String URL = "https://api.vk.com/method/friends.get?user_id="+id+"&fields=photo_100";
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(new HttpGet(URL));
@@ -69,15 +35,29 @@ public class APIvk {
         List<VkUser> friendList = new ArrayList<>();
         for (int i = 0; i < jarr.length(); i++){
             friendList.add(new VkUser(jarr.get(i).toString()));
+            System.out.print(jarr.get(i).toString() + " ");
         }
+        System.out.println();
         return friendList;
     }
 
-    synchronized public Set<VkUser> getMutualFriends(String id1, String id2) throws IOException, JSONException{
+    public Set<VkUser> getMutualFriends(String id1, String id2) throws URISyntaxException, HttpException, IOException, JSONException{
         Set<VkUser> mutualFriends = new HashSet<>();
         mutualFriends.addAll(getFriends(id1));
         mutualFriends.retainAll(getFriends(id2));
+        System.out.println("Number: "+mutualFriends.size());
+        System.out.println(mutualFriends.toString());
         return mutualFriends;
     }
 
+    /*public VkUser getUser(String id) throws URISyntaxException, HttpException, IOException, JSONException {
+        String URL = "https://api.vk.com/method/users.get?user_id="+id+"&fields=photo_100";
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = httpClient.execute(new HttpGet(URL));
+        HttpEntity entity = response.getEntity();
+        String responseString = EntityUtils.toString(entity, "UTF-8");
+        VkUser user = new VkUser();
+        user.parseAndSetUser(responseString);
+        return user;
+    }*/
 }

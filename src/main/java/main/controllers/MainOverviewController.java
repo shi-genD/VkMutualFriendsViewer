@@ -13,15 +13,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import main.Main;
-import main.apivk.APIvk;
 import main.apivk.VkUser;
 import main.net.ImageLoaderCallable;
 import main.net.ImageViewAsyncApplier;
+import main.net.MutualFriendsCallable;
+import main.utils.MyWrapper;
 import main.utils.UserNotFoundException;
-import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -65,7 +65,7 @@ public class MainOverviewController {
         for (Label l : labels)
             l.setText("");
 
-        APIvk apiVk = new APIvk();
+        /*APIvk apiVk = new APIvk();
         try {
             String id1 = apiVk.parseInputId(firstId.getText(), 0);
             String id2 = apiVk.parseInputId(secondId.getText(), 1);
@@ -74,6 +74,19 @@ public class MainOverviewController {
         } catch (UserNotFoundException e) {
             labels.get(e.getNumber()).setText(e.getMessage());
         } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }*/
+        try {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Future<MyWrapper> future = executor.submit(new MutualFriendsCallable(firstId.getText(), secondId.getText()));
+            MyWrapper result = future.get();
+            if (result.getValue() instanceof Set) {
+                showResult((Set<VkUser>) result.getValue());
+            } else {
+                UserNotFoundException e = (UserNotFoundException) result.getValue();
+                labels.get(e.getNumber()).setText(e.getMessage());
+            }
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
     }

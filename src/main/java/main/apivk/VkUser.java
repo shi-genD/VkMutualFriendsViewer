@@ -7,13 +7,26 @@ import org.json.JSONObject;
  * Created by shi on 21.09.16.
  */
 public class VkUser {
-    private String firstName;
-    private String lastName;
-    private String userId;
-    private String photoURL;
+    private final String firstName;
+    private final String lastName;
+    private final String userId;
+    private final String photoURL;
 
-    public VkUser(String source) {
-        parseAndSetUser(source);
+    public static VkUser parse(String jsonSource) {
+        return new VkUser(jsonSource);
+    }
+
+    private VkUser(String source) {
+        try {
+            JSONObject jo = new JSONObject(source);
+            firstName = jo.getString("first_name");
+            lastName = jo.getString("last_name");
+            userId = jo.getString("uid");
+            photoURL = jo.getString("photo_100").replaceAll("\\\\", "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public String getFirstName() {
@@ -24,40 +37,12 @@ public class VkUser {
         return lastName;
     }
 
-    public String getPhotoURL() {
-        return photoURL;
-    }
-
     public String getUserId() {
         return userId;
     }
 
-    private void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    private void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    private void setPhotoURL(String photoURL) {
-        this.photoURL = photoURL;
-    }
-
-    private void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    void parseAndSetUser(String source) {
-        try {
-            JSONObject jo = new JSONObject(source);
-            setFirstName(jo.getString("first_name"));
-            setLastName(jo.getString("last_name"));
-            setUserId(jo.getString("uid"));
-            setPhotoURL(jo.getString("photo_100").replaceAll("\\\\", ""));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public String getPhotoURL() {
+        return photoURL;
     }
 
     @Override
@@ -74,15 +59,13 @@ public class VkUser {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof VkUser)) return false;
-
         VkUser vkUser = (VkUser) o;
-
         return userId.equals(vkUser.userId);
-
     }
 
     @Override
     public int hashCode() {
         return userId.hashCode();
     }
+
 }

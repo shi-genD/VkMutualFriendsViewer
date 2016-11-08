@@ -11,20 +11,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import main.Main;
+import main.apivk.APIvk;
 import main.apivk.VkUser;
 import main.net.ImageLoaderCallable;
 import main.net.ImageViewAsyncApplier;
-import main.net.MutualFriendsCallable;
-import main.utils.MyWrapper;
+import main.utils.ResultSetWrap;
 import main.utils.UserNotFoundException;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
+
 import static java.util.stream.Collectors.toList;
 
 public class MainOverviewController {
@@ -47,6 +46,9 @@ public class MainOverviewController {
     @FXML
     private FlowPane flowPane;
 
+    @FXML
+    private AnchorPane anchorPane;
+
     private Main mainApp;
 
     @FXML
@@ -61,34 +63,28 @@ public class MainOverviewController {
     private void handleGo() throws InterruptedException {
         flowPane.getChildren().clear();
         List<Label> labels = new ArrayList<>();
-        labels.add(firstErrMsg); labels.add(secondErrMsg);
+        labels.add(firstErrMsg);
+        labels.add(secondErrMsg);
         for (Label l : labels)
             l.setText("");
 
-        /*APIvk apiVk = new APIvk();
-        try {
-            String id1 = apiVk.parseInputId(firstId.getText(), 0);
-            String id2 = apiVk.parseInputId(secondId.getText(), 1);
-            Set<VkUser> mutualFriends = apiVk.getMutualFriends(id1, id2);
-            showResult(mutualFriends);
-        } catch (UserNotFoundException e) {
-            labels.get(e.getNumber()).setText(e.getMessage());
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }*/
-        try {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<MyWrapper> future = executor.submit(new MutualFriendsCallable(firstId.getText(), secondId.getText()));
-            MyWrapper result = future.get();
-            if (result.getValue() instanceof Set) {
-                showResult((Set<VkUser>) result.getValue());
-            } else {
-                UserNotFoundException e = (UserNotFoundException) result.getValue();
-                labels.get(e.getNumber()).setText(e.getMessage());
-            }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+        CompletableFuture<ResultSetWrap> future = CompletableFuture.supplyAsync(() -> APIvk.parseInputId(firstId.getText(), 0))
+                .thenCombineAsync(CompletableFuture.supplyAsync(() -> APIvk.parseInputId(secondId.getText(), 1)), APIvk::getMutualFriends)
+                .exceptionally(x -> {
+                    if (x.getCause() instanceof UserNotFoundException) {
+                        UserNotFoundException e = (UserNotFoundException) x.getCause();
+                        return  new ResultSetWrap(e);
+                    } else {
+                        x.printStackTrace();
+                        return null;
+                    }
+                });
+        ResultSetWrap result = future.join();
+        if (result.isSuccess())
+            showResult(result.getResultSet());
+        else
+            labels.get(result.getException().getNumber()).setText(result.getException().getMessage());
+
     }
 
     private void showResult(Set<VkUser> mutualFriends){
@@ -100,21 +96,20 @@ public class MainOverviewController {
 
             Map<VkUser, Future<Image>> friendsPhotos = getUserPhotos(mutualFriends);
             ImageViewAsyncApplier imageViewApplier = new ImageViewAsyncApplier();
-
             for (VkUser user : mutualFriends) {
                 ImageView avatar = new ImageView();
                 Future<Image> imageFuture = friendsPhotos.get(user);
                 imageViewApplier.add(imageFuture, avatar);
                 String userUrl = "http://vk.com/id" + user.getUserId();
-                Button userView = new Button(user.getFirstName()+"\n"
+                Button userView = new Button(user.getFirstName() + "\n"
                         + user.getLastName(), avatar);
                 HostServicesDelegate hostService = HostServicesFactory.getInstance(mainApp);
-                userView.setOnAction( (ae) -> hostService.showDocument(userUrl) );
+                userView.setOnAction((ae) -> hostService.showDocument(userUrl));
                 userView.setContentDisplay(ContentDisplay.TOP);
                 flowPane.getChildren().add(userView);
             }
             imageViewApplier.startApplying();
-    }
+        }
 
     public void setMain(Main mainApp) { this.mainApp = mainApp; }
 
@@ -133,10 +128,7 @@ public class MainOverviewController {
         Iterator<VkUser> userIterator = users.iterator();
 
         while (userIterator.hasNext()) {
-
-            result.put(userIterator.next(),
-                    imageFutures.get(index++));
-
+            result.put(userIterator.next(), imageFutures.get(index++));
         }
         return result;
     }

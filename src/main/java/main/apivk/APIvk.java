@@ -1,5 +1,7 @@
 package main.apivk;
 
+import main.utils.MutualFriendsEvaluationException;
+import main.utils.ResultSetWrap;
 import main.utils.StringParser;
 import main.utils.UserNotFoundException;
 import org.apache.http.HttpEntity;
@@ -13,17 +15,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by shi on 21.09.16.
  */
 public class APIvk {
 
-    public String parseInputId(String str, int n) throws UserNotFoundException, IOException{
+    public static VkUser parseInputId(String str, int n) throws UserNotFoundException{
         if (str == null || str.length() == 0)
             throw new UserNotFoundException("Invalid user id", n);
         StringParser sp = new StringParser(str);
@@ -36,9 +35,9 @@ public class APIvk {
             throw new UserNotFoundException("Invalid user id", n);
     }
 
-    private String getId(String shortLink, int n) throws IOException, UserNotFoundException{
+    private static VkUser getId(String shortLink, int n) throws UserNotFoundException{
         try {
-            String URL = "https://api.vk.com/method/users.get?user_ids=" + shortLink;
+            String URL = "https://api.vk.com/method/users.get?user_ids=" + shortLink + "&fields=photo_100";
             HttpClient httpClient = new DefaultHttpClient();
             HttpResponse response = httpClient.execute(new HttpGet(URL));
             HttpEntity entity = response.getEntity();
@@ -50,15 +49,17 @@ public class APIvk {
             if (jo.has("deactivated")) {
                 throw new UserNotFoundException("User " + jo.getString("deactivated"), n);
             }
-            return jo.getString("uid");
+            return VkUser.parse(jo.toString());
         }  catch (JSONException e) {
             throw new UserNotFoundException("Invalid user id", n);
+        } catch (IOException e) {
+            throw new MutualFriendsEvaluationException(e);
         }
 
     }
 
-    private List<VkUser> getFriends(String id) throws IOException, JSONException {
-        String URL = "https://api.vk.com/method/friends.get?user_id="+id+"&fields=photo_100";
+    private static List<VkUser> getFriends(VkUser user) throws IOException, JSONException {
+        String URL = "https://api.vk.com/method/friends.get?user_id="+user.getUserId()+"&fields=photo_100";
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(new HttpGet(URL));
         HttpEntity entity = response.getEntity();
@@ -68,16 +69,19 @@ public class APIvk {
         JSONArray jarr = json.getJSONArray("response");
         List<VkUser> friendList = new ArrayList<>();
         for (int i = 0; i < jarr.length(); i++){
-            friendList.add(new VkUser(jarr.get(i).toString()));
+            friendList.add(VkUser.parse(jarr.get(i).toString()));
         }
         return friendList;
     }
 
-    synchronized public Set<VkUser> getMutualFriends(String id1, String id2) throws IOException, JSONException{
+    public static ResultSetWrap getMutualFriends(VkUser user1, VkUser user2){
         Set<VkUser> mutualFriends = new HashSet<>();
-        mutualFriends.addAll(getFriends(id1));
-        mutualFriends.retainAll(getFriends(id2));
-        return mutualFriends;
+        try {
+            mutualFriends.addAll(getFriends(user1));
+            mutualFriends.retainAll(getFriends(user2));
+            return new ResultSetWrap(mutualFriends);
+        } catch (IOException | JSONException e) {
+            throw new MutualFriendsEvaluationException(e);
+        }
     }
-
 }

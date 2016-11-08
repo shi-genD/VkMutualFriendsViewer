@@ -6,7 +6,7 @@
 
 <SplitPane dividerPositions="0.29238754325259514" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="580.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controllers.MainOverviewController">
    <items>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane fx:id="anchorPane" prefHeight="200.0" prefWidth="200.0">
          <children>
             <Label layoutX="59.0" layoutY="27.0" text="Insert ids in fields below and press &quot;Go&quot;" />
             <Label layoutX="103.0" layoutY="64.0" text="id" />
